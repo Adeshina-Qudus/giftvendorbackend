@@ -37,13 +37,21 @@ app.post("/submit", async (req, res) => {
     let longitude = "?";
 
     if (ip) {
-      const geoRes = await fetch(`http://ip-api.com/json/${ip}`);
-      const geo = await geoRes.json();
-      console.log("location from ip ==--==", geo);
-      if (geo.status === "success") {
-        location = `${geo.city}, ${geo.regionName}, ${geo.country}`;
-        latitude = geo.lat;
-        longitude = geo.lon;
+      try {
+        const geoRes = await fetch(`http://ip-api.com/json/${ip}`);
+        const text = await geoRes.text(); // read as text first
+        if (text) {
+          const geo = JSON.parse(text);
+          console.log("location from ip ==--==", geo);
+          if (geo.status === "success") {
+            location = `${geo.city}, ${geo.regionName}, ${geo.country}`;
+            latitude = geo.lat;
+            longitude = geo.lon;
+          }
+        }
+      } catch (geoError) {
+        console.log("geo lookup failed, continuing:", geoError.message);
+        // location stays as "?, ?, ?" — message still sends
       }
     }
 
