@@ -152,9 +152,9 @@ app.post("/webhook", async (req, res) => {
     if (data === "number-prompt") {
       // Build 1-100 grid and edit the same message
       const rows = [];
-      for (let i = 1; i <= 100; i += 10) {
+      for (let i = 1; i <= 100; i += 5) {
         const row = [];
-        for (let j = i; j < i + 10 && j <= 100; j++) {
+        for (let j = i; j < i + 5 && j <= 100; j++) {
           row.push({ text: `${j}`, callback_data: `show-number:${j}` });
         }
         rows.push(row);
